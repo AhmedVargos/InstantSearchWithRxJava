@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">InstantSearchWithRxJava</string>
+    <string name="action_settings">Settings</string>
+    <string name="activity_local_search">Local Search</string>
+    <string name="activity_remote_search">Remote Search</string>
+    <string name="hint_search">Type movie name</string>
+</resources>
