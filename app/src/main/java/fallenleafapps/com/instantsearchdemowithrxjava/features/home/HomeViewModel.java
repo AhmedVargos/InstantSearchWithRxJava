@@ -1,6 +1,7 @@
 package fallenleafapps.com.instantsearchdemowithrxjava.features.home;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.ViewModel;
 import android.support.annotation.RestrictTo;
 
 import java.util.ArrayList;
@@ -14,12 +15,12 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
-public class HomeViewModel {
+public class HomeViewModel extends ViewModel{
 
     final BehaviorSubject<List<Movie>> movieList = BehaviorSubject.createDefault(new ArrayList<>());
     final BehaviorSubject<Boolean> loading = BehaviorSubject.createDefault(false);
     final BehaviorSubject<List<SearchItem>> searchHistoryList = BehaviorSubject.createDefault(new ArrayList<>());
-    final BehaviorSubject<String> searchInput = BehaviorSubject.createDefault("");
+    final BehaviorSubject<String> searchMovies = BehaviorSubject.createDefault("");
 
     private final CompositeDisposable disposables = new CompositeDisposable();
     private final DataSource dataSource;
@@ -34,5 +35,15 @@ public class HomeViewModel {
     HomeViewModel(DataSource dataSource, Scheduler computation) {
         this.dataSource = dataSource;
         this.scheduler = computation;
+    }
+
+    @Override
+    protected void onCleared() {
+        disposables.clear();
+        movieList.onComplete();
+        searchMovies.onComplete();
+        loading.onComplete();
+        searchHistoryList.onComplete();
+        super.onCleared();
     }
 }
