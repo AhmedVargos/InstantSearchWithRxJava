@@ -20,5 +20,8 @@ public interface MovieSuggestionDao {
     @Query("select * from MovieSuggestion")
     Flowable<List<MovieSuggestion>> getAllSuggestions();
 
+    @Query("select * from MovieSuggestion where word LIKE :item")
+    Flowable<List<MovieSuggestion>> query(String item);
+
 
 }
