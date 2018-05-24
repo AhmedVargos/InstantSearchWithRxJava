@@ -7,7 +7,6 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
 
@@ -15,6 +14,7 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.jakewharton.rxbinding2.widget.TextViewTextChangeEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -57,9 +57,16 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private Disposable bindAutoCompleteHistory(BehaviorSubject<List<MovieSuggestion>> searchHistoryList) {
-        ArrayAdapter<MovieSuggestion> adapter = new ArrayAdapter<>(this,
+/*        ArrayAdapter<MovieSuggestion> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line,
                 searchHistoryList.getValue());
+*/
+        List<MovieSuggestion> temp = new ArrayList<>();
+        temp.add(new MovieSuggestion("2232","first"));
+        temp.add(new MovieSuggestion("22312","third"));
+        temp.add(new MovieSuggestion("22324","second"));
+        SearchFieldAdapter adapter = new SearchFieldAdapter(this, android.R.layout.simple_dropdown_item_1line,
+                searchHistoryList);
 
         /*String[] test = {"first","second","third"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
@@ -69,9 +76,7 @@ public class HomeActivity extends AppCompatActivity {
 
         inputSearch.setAdapter(adapter);
         inputSearch.setThreshold(1);
-        return searchHistoryList.share()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(ignoredValue -> adapter.notifyDataSetChanged());
+        return adapter.getDisposable();
     }
 
 

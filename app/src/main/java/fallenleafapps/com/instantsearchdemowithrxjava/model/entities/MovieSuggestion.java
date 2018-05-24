@@ -12,9 +12,9 @@ import android.support.annotation.NonNull;
 public class MovieSuggestion {
         @PrimaryKey
         @NonNull
-        private final String uuid; //new Primary key
+        private final String uuid; //new Primary key Ahmed
 
-        private final String word; //Cannot be the primary key because the unique constraint
+        private final String word; //Cannot be the primary key because the unique constraint Ahmed
 
         public MovieSuggestion(@NonNull String uuid, String word) {
                 this.uuid = uuid;
@@ -27,4 +27,10 @@ public class MovieSuggestion {
         public String getUuid() {
                 return uuid;
         }
+
+        @Override
+        public String toString() {
+                return this.word;
+        }
 }
+

@@ -16,6 +16,7 @@ import fallenleafapps.com.instantsearchdemowithrxjava.model.entities.MovieSugges
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -76,11 +77,19 @@ public class HomeViewModel extends ViewModel {
 
     private Disposable getHistorySearchFromDataSource()
     {
+        //for now the behavior for the empty query is a little weird for now so i commented it  Ahmed
+
         if (!searchMovies.getValue().equals(""))
             return getSpecificSuggestions();
         else {
-            return getAllSuggestions();
+            return Observable.just("test")
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe();
+            //return getAllSuggestions();
         }
+
+
     }
 
     private Disposable getAllSuggestions()
@@ -98,7 +107,7 @@ public class HomeViewModel extends ViewModel {
     {
         return MovieRoomDatabase.getDatabase(context)
                 .getMovieSuggestions()
-                .query(searchMovies.getValue())
+                .query("%" + searchMovies.getValue() + "%" ) //for the query Ahmed
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
                 .subscribe(searchHistoryList::onNext);
@@ -118,7 +127,7 @@ public class HomeViewModel extends ViewModel {
                 .doFinally(() -> searchMovies.onNext(""))
                 .subscribe(this::makeNewSuggestion);
 
-        //Cannot Return null because disposable does not take nulls
+        //Cannot Return null because disposable does not take nulls Ahmed
         /*
         if (!searchMovies.getValue().equals("")) {
 
