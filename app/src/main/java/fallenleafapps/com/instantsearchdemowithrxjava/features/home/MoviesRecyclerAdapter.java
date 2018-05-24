@@ -8,8 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
+import fallenleafapps.com.instantsearchdemowithrxjava.Application;
 import fallenleafapps.com.instantsearchdemowithrxjava.R;
 import fallenleafapps.com.instantsearchdemowithrxjava.model.entities.Movie;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -26,6 +29,7 @@ class MoviesRecyclerAdapter extends RecyclerView.Adapter<MoviesRecyclerAdapter.M
         disposable = this.dataSource.share()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(movieList -> notifyDataSetChanged());
+
     }
 
     @NonNull
@@ -42,7 +46,9 @@ class MoviesRecyclerAdapter extends RecyclerView.Adapter<MoviesRecyclerAdapter.M
     public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
         holder.movieTitle.setText(dataSource.getValue().get(position).getTitle());
         holder.movieDate.setText(dataSource.getValue().get(position).getReleaseDate());
-        //holder.movieTitle.setText(dataSource.getValue().get(position).get);
+        Glide.with(Application.getContext())
+                .load("https://image.tmdb.org/t/p/w500" + dataSource.getValue().get(position).getPosterPath())
+                .into(holder.movieImage);
     }
 
     @Override

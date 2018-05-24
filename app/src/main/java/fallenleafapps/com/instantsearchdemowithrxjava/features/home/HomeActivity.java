@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
 
+import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.jakewharton.rxbinding2.widget.TextViewTextChangeEvent;
 
@@ -21,7 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import fallenleafapps.com.instantsearchdemowithrxjava.R;
 import fallenleafapps.com.instantsearchdemowithrxjava.model.entities.Movie;
-import fallenleafapps.com.instantsearchdemowithrxjava.model.entities.SearchItem;
+import fallenleafapps.com.instantsearchdemowithrxjava.model.entities.MovieSuggestion;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -52,13 +53,20 @@ public class HomeActivity extends AppCompatActivity {
         disposables.add(bindProgressView(viewModel.loading));
         disposables.add(bindRecyclerView(viewModel.movieList));
         //Need to make the click work
-        //disposables.add(bindSearchButton(viewModel));
+        disposables.add(bindSearchButton(viewModel));
     }
 
-    private Disposable bindAutoCompleteHistory(BehaviorSubject<List<SearchItem>> searchHistoryList) {
-        ArrayAdapter<SearchItem> adapter = new ArrayAdapter<>(this,
+    private Disposable bindAutoCompleteHistory(BehaviorSubject<List<MovieSuggestion>> searchHistoryList) {
+        ArrayAdapter<MovieSuggestion> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line,
                 searchHistoryList.getValue());
+
+        /*String[] test = {"first","second","third"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line,
+                test);
+        */
+
         inputSearch.setAdapter(adapter);
         inputSearch.setThreshold(1);
         return searchHistoryList.share()
@@ -66,19 +74,29 @@ public class HomeActivity extends AppCompatActivity {
                 .subscribe(ignoredValue -> adapter.notifyDataSetChanged());
     }
 
-    /*
+
     private Disposable bindSearchButton(HomeViewModel viewModel) {
 
         return RxView.clicks(searchMovies)
+                .observeOn(AndroidSchedulers.mainThread())
                 .debounce(1, TimeUnit.SECONDS)
-                .subscribe(viewModel-> v);
+                .subscribe(ignoredValue -> addSuggestionToHistoryAndSearch(viewModel));
     }
-    */
+
+    private void addSuggestionToHistoryAndSearch(HomeViewModel viewModel) {
+        viewModel.insertSearchResult();
+        viewModel.startRequestMovies();
+    }
+
 
     private Disposable bindRecyclerView(BehaviorSubject<List<Movie>> movieList) {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         MoviesRecyclerAdapter adapter = new MoviesRecyclerAdapter(movieList);
         recyclerView.setAdapter(adapter);
+        disposables.add(movieList.share()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(ignoredValue -> recyclerView.scrollToPosition(0)));
+
         return adapter.getDisposable();
     }
 

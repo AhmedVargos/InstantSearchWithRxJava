@@ -2,8 +2,8 @@ package fallenleafapps.com.instantsearchdemowithrxjava.model.entities;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
-import io.reactivex.annotations.NonNull;
 
 /**
  * Created by Asmaa on 5/19/2018.
@@ -12,10 +12,19 @@ import io.reactivex.annotations.NonNull;
 public class MovieSuggestion {
         @PrimaryKey
         @NonNull
-        private String word;
+        private final String uuid; //new Primary key
 
-        public MovieSuggestion(@NonNull String word) {this.word = word;}
+        private final String word; //Cannot be the primary key because the unique constraint
+
+        public MovieSuggestion(@NonNull String uuid, String word) {
+                this.uuid = uuid;
+                this.word = word;
+        }
 
         public String getWord(){return this.word;}
 
+        @NonNull
+        public String getUuid() {
+                return uuid;
+        }
 }

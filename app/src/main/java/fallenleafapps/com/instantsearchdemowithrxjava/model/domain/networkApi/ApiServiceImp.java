@@ -20,7 +20,7 @@ public class ApiServiceImp {
     }
 
     public Single<SearchResponseModule> getAllPopularMovies(){
-        return apiService.getSearchResults(KEY,LANG, SORT_TYPE)
+        return apiService.getAllPopular(KEY,LANG, SORT_TYPE)
                 .subscribeOn(Schedulers.io());
     }
 

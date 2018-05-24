@@ -4,20 +4,18 @@ import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.support.annotation.RestrictTo;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import fallenleafapps.com.instantsearchdemowithrxjava.Application;
 import fallenleafapps.com.instantsearchdemowithrxjava.model.domain.DataSource;
 import fallenleafapps.com.instantsearchdemowithrxjava.model.domain.database.MovieRoomDatabase;
 import fallenleafapps.com.instantsearchdemowithrxjava.model.entities.Movie;
 import fallenleafapps.com.instantsearchdemowithrxjava.model.entities.MovieSuggestion;
-import fallenleafapps.com.instantsearchdemowithrxjava.model.entities.SearchItem;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.Scheduler;
-import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -39,7 +37,7 @@ public class HomeViewModel extends ViewModel {
     @SuppressLint("RestrictedApi")
     public HomeViewModel()
     {
-        this(null, new DataSource(), Schedulers.computation());
+        this(Application.getContext(), new DataSource(), Schedulers.computation());
     }
 
     @RestrictTo(RestrictTo.Scope.TESTS)
@@ -48,6 +46,9 @@ public class HomeViewModel extends ViewModel {
         this.context = context;
         this.dataSource = dataSource;
         this.scheduler = computation;
+        disposables.add(searchMovies.share()
+            .subscribe(ignoredValue -> getHistorySearch()));
+        startRequestMovies();
     }
 
     public void startRequestMovies()
@@ -59,7 +60,7 @@ public class HomeViewModel extends ViewModel {
     {
         loading.onNext(true);
 
-        return (dataSource.getMoviesResult(""))
+        return (dataSource.getMoviesResult(searchMovies.getValue()))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.io())
                 .doOnError(Throwable::printStackTrace)
@@ -110,17 +111,29 @@ public class HomeViewModel extends ViewModel {
 
     private Disposable insertSearchResultToDB()
     {
-        if (!searchMovies.getValue().equals("")) {
-            return Observable.just(searchMovies.getValue())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(Schedulers.computation())
-                    .doFinally(() -> searchMovies.onNext(""))
-                    .subscribe((string) -> MovieRoomDatabase.getDatabase(context)
-                            .getMovieSuggestions()
-                            .insert(new MovieSuggestion(string)));
+        return Observable.just(searchMovies.getValue())
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.computation())
+                .filter(val -> !val.isEmpty())
+                .doFinally(() -> searchMovies.onNext(""))
+                .subscribe(this::makeNewSuggestion);
 
+        //Cannot Return null because disposable does not take nulls
+        /*
+        if (!searchMovies.getValue().equals("")) {
+
+
+        }else {
+            //return Disposable;
         }
         return null;
+        */
+    }
+
+    private void makeNewSuggestion(String word){
+        MovieRoomDatabase.getDatabase(context)
+                .getMovieSuggestions()
+                .insert(new MovieSuggestion(String.valueOf(Math.random()),word));
     }
 
     @Override
