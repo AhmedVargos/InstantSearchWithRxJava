@@ -32,10 +32,16 @@ public class DataSourceGenerator extends DataSource {
             return Single.error(new UnsupportedOperationException("---error---"));
         }
 
+
         List<Movie> movies=generateMovies();
         if(query.isEmpty()) {
-            return Observable.just(movies)
-                  .firstOrError();
+            return Single.just(movies);
+            /* to convert observable to single
+            singleOrError
+                firstOrError
+                lastOrError
+                elementAtOrError
+             */
         }else {
 
          return Observable.fromIterable(movies)
@@ -77,7 +83,7 @@ public class DataSourceGenerator extends DataSource {
         movieSuggestions.add(movieSuggestion);
         return movieSuggestions;
     }
-    public List<Movie> generateMovies(){
+    private List<Movie> generateMovies(){
         List<Movie> movies=new ArrayList<>();
         Movie movie=new Movie(1,2,true,1.2,"string1",5.6,"path","string","string",generateListOfInt(),"object",true,"string","15-9-2001");
         movies.add(movie);
