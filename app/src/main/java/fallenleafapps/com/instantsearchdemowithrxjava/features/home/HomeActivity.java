@@ -48,6 +48,7 @@ public class HomeActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         HomeViewModel viewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
+        viewModel.startRequestMovies();
         disposables.add(bindSearchMovieTextView(viewModel.searchMovies));
         disposables.add(bindAutoCompleteHistory(viewModel.searchHistoryList));
         disposables.add(bindProgressView(viewModel.loading));

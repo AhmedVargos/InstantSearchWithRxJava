@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.support.annotation.RestrictTo;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +22,15 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 
 
 public class HomeViewModel extends ViewModel {
 
-    final BehaviorSubject<List<Movie>> movieList = BehaviorSubject.createDefault(new ArrayList<>());
-    final BehaviorSubject<Boolean> loading = BehaviorSubject.createDefault(false);
-    final BehaviorSubject<List<MovieSuggestion>> searchHistoryList = BehaviorSubject.createDefault(new ArrayList<>());
-    final BehaviorSubject<String> searchMovies = BehaviorSubject.createDefault("");
+    public final BehaviorSubject<List<Movie>> movieList = BehaviorSubject.createDefault(new ArrayList<>());
+    public final BehaviorSubject<Boolean> loading = BehaviorSubject.createDefault(false);
+    public final BehaviorSubject<List<MovieSuggestion>> searchHistoryList = BehaviorSubject.createDefault(new ArrayList<>());
+    public final BehaviorSubject<String> searchMovies = BehaviorSubject.createDefault("");
 
     private final CompositeDisposable disposables = new CompositeDisposable();
     private DataSource dataSource;
@@ -40,16 +42,15 @@ public class HomeViewModel extends ViewModel {
     {
         this(Application.getContext(), new DataSource(), Schedulers.computation());
     }
-
     @RestrictTo(RestrictTo.Scope.TESTS)
-    HomeViewModel(Context context, DataSource dataSource, Scheduler computation)
+   public HomeViewModel(Context context, DataSource dataSource, Scheduler computation)
     {
         this.context = context;
         this.dataSource = dataSource;
         this.scheduler = computation;
         disposables.add(searchMovies.share()
             .subscribe(ignoredValue -> getHistorySearch()));
-        startRequestMovies();
+       // startRequestMovies();
     }
 
     public void startRequestMovies()
@@ -62,8 +63,8 @@ public class HomeViewModel extends ViewModel {
         loading.onNext(true);
 
         return (dataSource.getMoviesResult(searchMovies.getValue()))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.io())
+                .subscribeOn(scheduler)
+                .observeOn(scheduler)
                 .doOnError(Throwable::printStackTrace)
                 .doFinally(() -> loading.onNext(false))
                 .subscribe(movieList::onNext);
@@ -83,8 +84,8 @@ public class HomeViewModel extends ViewModel {
             return getSpecificSuggestions();
         else {
             return Observable.just("test")
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(scheduler)
+                    .observeOn(scheduler)
                     .subscribe();
             //return getAllSuggestions();
         }
@@ -97,19 +98,17 @@ public class HomeViewModel extends ViewModel {
         return MovieRoomDatabase.getDatabase(context)
                 .getMovieSuggestions()
                 .getAllSuggestions()
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.computation())
+                .subscribeOn(scheduler)
+                .observeOn(scheduler)
                 .subscribe(searchHistoryList::onNext);
 
     }
 
     private Disposable getSpecificSuggestions()
     {
-        return MovieRoomDatabase.getDatabase(context)
-                .getMovieSuggestions()
-                .query("%" + searchMovies.getValue() + "%" ) //for the query Ahmed
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.computation())
+        return dataSource.getSuggestionFromDB(searchMovies.getValue())
+                .subscribeOn(scheduler)
+                .observeOn(scheduler)
                 .subscribe(searchHistoryList::onNext);
     }
 
@@ -121,28 +120,16 @@ public class HomeViewModel extends ViewModel {
     private Disposable insertSearchResultToDB()
     {
         return Observable.just(searchMovies.getValue())
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.computation())
+                .subscribeOn(scheduler)
+                .observeOn(scheduler)
                 .filter(val -> !val.isEmpty())
                 .doFinally(() -> searchMovies.onNext(""))
                 .subscribe(this::makeNewSuggestion);
 
-        //Cannot Return null because disposable does not take nulls Ahmed
-        /*
-        if (!searchMovies.getValue().equals("")) {
-
-
-        }else {
-            //return Disposable;
-        }
-        return null;
-        */
     }
 
     private void makeNewSuggestion(String word){
-        MovieRoomDatabase.getDatabase(context)
-                .getMovieSuggestions()
-                .insert(new MovieSuggestion(String.valueOf(Math.random()),word));
+       dataSource.addNewSuggestion(word);
     }
 
     @Override

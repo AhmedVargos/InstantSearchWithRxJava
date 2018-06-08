@@ -46,9 +46,29 @@ public class Movie {
     @SerializedName("overview")
     @Expose
     private String overview;
+
+    public Movie(Integer voteCount, Integer id, Boolean video, Double voteAverage, String title, Double popularity, Object posterPath, String originalLanguage, String originalTitle, List<Integer> genreIds, Object backdropPath, Boolean adult, String overview, String releaseDate) {
+        this.voteCount = voteCount;
+        this.id = id;
+        this.video = video;
+        this.voteAverage = voteAverage;
+        this.title = title;
+        this.popularity = popularity;
+        this.posterPath = posterPath;
+        this.originalLanguage = originalLanguage;
+        this.originalTitle = originalTitle;
+        this.genreIds = genreIds;
+        this.backdropPath = backdropPath;
+        this.adult = adult;
+        this.overview = overview;
+        this.releaseDate = releaseDate;
+    }
+
     @SerializedName("release_date")
     @Expose
     private String releaseDate;
+    public Movie(){}
+
 
     public Integer getVoteCount() {
         return voteCount;
