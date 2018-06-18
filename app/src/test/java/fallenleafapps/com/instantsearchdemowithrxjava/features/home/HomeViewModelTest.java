@@ -1,17 +1,12 @@
-package fallenleafapps.com.instantsearchdemowithrxjava.home.test;
+package fallenleafapps.com.instantsearchdemowithrxjava.features.home;
 
 
 
 import org.junit.Test;
 
-import java.util.List;
-
 import fallenleafapps.com.instantsearchdemowithrxjava.Application;
-import fallenleafapps.com.instantsearchdemowithrxjava.features.home.HomeViewModel;
-import fallenleafapps.com.instantsearchdemowithrxjava.home.test.Mock.DataSourceGenerator;
+import fallenleafapps.com.instantsearchdemowithrxjava.features.home.Mock.DataSourceGenerator;
 import fallenleafapps.com.instantsearchdemowithrxjava.model.domain.DataSource;
-import io.reactivex.Scheduler;
-import io.reactivex.schedulers.Schedulers;
 import io.reactivex.schedulers.TestScheduler;
 
 import static junit.framework.Assert.assertTrue;

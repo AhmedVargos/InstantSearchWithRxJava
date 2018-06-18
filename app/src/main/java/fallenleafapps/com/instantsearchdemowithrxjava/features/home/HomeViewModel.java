@@ -27,10 +27,10 @@ import io.reactivex.subjects.PublishSubject;
 
 public class HomeViewModel extends ViewModel {
 
-    public final BehaviorSubject<List<Movie>> movieList = BehaviorSubject.createDefault(new ArrayList<>());
-    public final BehaviorSubject<Boolean> loading = BehaviorSubject.createDefault(false);
-    public final BehaviorSubject<List<MovieSuggestion>> searchHistoryList = BehaviorSubject.createDefault(new ArrayList<>());
-    public final BehaviorSubject<String> searchMovies = BehaviorSubject.createDefault("");
+     final BehaviorSubject<List<Movie>> movieList = BehaviorSubject.createDefault(new ArrayList<>());
+     final BehaviorSubject<Boolean> loading = BehaviorSubject.createDefault(false);
+     final BehaviorSubject<List<MovieSuggestion>> searchHistoryList = BehaviorSubject.createDefault(new ArrayList<>());
+     final BehaviorSubject<String> searchMovies = BehaviorSubject.createDefault("");
 
     private final CompositeDisposable disposables = new CompositeDisposable();
     private DataSource dataSource;

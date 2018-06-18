@@ -1,20 +1,13 @@
-package fallenleafapps.com.instantsearchdemowithrxjava.home.test.Mock;
-
-import android.arch.persistence.room.Index;
-import android.util.Log;
+package fallenleafapps.com.instantsearchdemowithrxjava.features.home.Mock;
 
 import java.util.ArrayList;
 import java.util.List;
 import fallenleafapps.com.instantsearchdemowithrxjava.model.domain.DataSource;
-import fallenleafapps.com.instantsearchdemowithrxjava.model.domain.database.MovieRoomDatabase;
-import fallenleafapps.com.instantsearchdemowithrxjava.model.domain.database.MovieSuggestionDao;
 import fallenleafapps.com.instantsearchdemowithrxjava.model.entities.Movie;
 import fallenleafapps.com.instantsearchdemowithrxjava.model.entities.MovieSuggestion;
-import fallenleafapps.com.instantsearchdemowithrxjava.model.entities.SearchResponseModule;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Hanaa on 6/3/2018.
